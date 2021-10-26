@@ -1,0 +1,13 @@
+{
+	"options":
+	{	
+		"editor": "subl", 
+		"open_editor": "0"  
+	},
+
+	"templates": 
+	{
+		"cow": "cow.py", 
+		"cat": "cat.txt"
+	}
+}
