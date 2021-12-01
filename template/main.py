@@ -54,12 +54,13 @@ def remove_template(name, templates, paths):
 		print(f"Cannot remove {name} from templates, since it is not saved in templates config")
 		exit()
 
-	tempate_path = paths["templates"].joinpath(templates[name])
-	tempate_path.unlink()
-
+	template_path = paths["templates"].joinpath(templates[name])
 	templates.pop(name)
-
 	write_config(templates, paths["templates_config"])
+
+	if template_path.exists():
+		template_path.unlink()
+
 
 def list_settings(settings):
 	print("Your current settings:")
