@@ -1,26 +1,71 @@
 #!/usr/bin/env python
-from template.main import read_config, copy
+from template.main import copy_template, list_templates, add_template, remove_template, list_settings, change_setting
+from template.loader import load_paths, load_templates, load_settings
 import argparse
 
+paths = load_paths()
+templates = load_templates(paths)
+settings = load_settings(paths)
 
-options, templates = read_config()
-template_keys = list(templates.keys())
+parser = argparse.ArgumentParser()
+subparser = parser.add_subparsers(help="commands", dest="command")
 
-parser = argparse.ArgumentParser(description="description")
+# Normal usage command
+get_parser = subparser.add_parser("get", help="Normal usage, fetches a tempalte from you templates based on your template name")
+get_parser.add_argument("name", metavar="name", type=str, help="Your own created name for the template you wish to use", choices=list(templates.keys()))
+get_parser.add_argument("-f", "--file", help="Name or path of new file to be created, if not specified the template filename will be used", required=False)
+get_parser.add_argument("-o", "--open", action="store_true", help="If the copied filed should be opened in editor after copy")
 
-parser.add_argument("temp", metavar="template alias", type=str, help="Your own created name for the template you wish to use", choices=template_keys)
-parser.add_argument("-f", "--file", help="Name or path of new file to be created", required=False)
+# List command
+list_parser = subparser.add_parser("list", help="List templates")
+
+# Add command
+add_parser = subparser.add_parser("add", help="Given a file and a template name, add it to avalible templates")
+add_parser.add_argument("file", metavar="file", help="File to be added to templates")
+add_parser.add_argument("name", metavar="name", help="Template name you want to refere to file as")
+add_parser.add_argument("-r", "--remove", action="store_true", help="If the file should be removed after added to templates")
+
+# Remove command
+remove_parser = subparser.add_parser("remove", help="Removes a template based on template name")
+remove_parser.add_argument("name", metavar="name", help="Template name to remove from templates")
+
+# Settings command
+settings_parser = subparser.add_parser("settings", help="Configure user settings")
+settings_parser.add_argument("-l", "--list", action="store_true", help="Show current settings")
+settings_parser.add_argument("-c", "--change", action="append", nargs=2, metavar=("name", "state"), help="Change settings 'name' to take the value 'state'")
 
 args = vars(parser.parse_args())
+command = args["command"]
+args.pop("command")
 
-template = templates[args["temp"]]
-filename = args["file"]
+if command == "get":
+	template_name = args["name"]
+	check_exsists = settings["ask_if_exsists"]
+	new_name = args["file"]
+	open_editor = any([settings["open_editor"], args["open"]])
+	editor = settings["editor"]
+	copy_template(template_name, templates, paths, check_exsists, new_name, open_editor, editor)
 
-if filename is None: filename = template
+if command == "list":
+	list_templates(templates)
 
-copy(filename, template)
+if command == "add":
+	new_file = args["file"]
+	new_name = args["name"]
+	remove = args["remove"]
 
-if options["open_editor"]:
-	import subprocess
-	cmd = f'{options["editor"]} {filename}'.split()
-	subprocess.run(cmd)
+	add_template(new_file, new_name, templates, paths, remove)
+
+if command == "remove":
+	template_name = args["name"]
+	remove_template(template_name, templates, paths)
+
+if command == "settings":
+	if args["list"]:
+		list_settings(settings)
+
+	elif args["change"] is not None:
+		args, = args["change"]
+		setting, state = args
+		
+		change_setting(setting, state, settings, paths)

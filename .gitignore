@@ -1,1 +1,7 @@
+*.json
+your_files_here/
+
 __pycache__/
+sandkasse/
+notes.md
+
