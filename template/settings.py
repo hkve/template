@@ -1,3 +1,5 @@
+from template.utils import write_config
+
 def list_settings(settings):
 	print("Your current settings:")
 	print("----------------------")
