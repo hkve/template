@@ -4,6 +4,39 @@ import pathlib as pl
 import subprocess
 from template.utils import ask_user, write_config
 
+def copy(old, new):
+	is_file = old.is_file()
+	is_folder = old.is_dir()
+
+	path_info = "object"
+	try:
+		if is_file:
+			path_info = "file"
+			shutil.copy(old, new)
+		elif is_folder:
+			path_info = "folder"
+			shutil.copytree(old, new, dirs_exist_ok=True)
+		else:
+			print(f"COPY ERROR: The {obj} {old} is of unknown type. Are you sure it is a file or folder?")
+			exit()
+	except Exception as error:
+		print(f"Unkown error with {path_info} copying from {old} to {new}")
+		print(error)
+		exit()
+
+def delete(path):
+	is_folder = path.is_dir()
+
+	try:
+		if is_folder:
+			shutil.rmtree(path)
+		else:
+			path.unlink()
+	except Exception as error:
+		print(f"Error in remove with {path}")
+		print(error)
+		exit()
+
 def copy_template(template_name, templates, paths, check_exsits=True, new_name=None, open_editor=False, editor=None):
 	if not template_name in templates.keys():
 		print(f'COPY ERROR: the template {template_name} is not found in {paths["templates_config"]}')
@@ -22,32 +55,22 @@ def copy_template(template_name, templates, paths, check_exsits=True, new_name=N
 		preform_copy = ask_user(question)
 
 	if preform_copy:
-		shutil.copy(old, new)
+		copy(old, new)
 
 		if open_editor:
-			subprocess.run([editor, new])
-
-def list_templates(templates):
-	print("Your current templates:")
-	print("-----------------------")
-	for key, value in templates.items():
-		print(f"{key:<20}{value:<20}") 
+			subprocess.run([editor, new]) 
 
 def add_template(new_file, new_name, templates, paths, remove=False):
 	new_file = pl.Path(new_file)
 
-	try:
-		shutil.copy(new_file, paths["templates"].joinpath(new_file.name))
-	except:
-		print(f"The file {new_file} chould not be added to templates, are you sure it's a file?")
-		exit()
+	copy(new_file, paths["templates"].joinpath(new_file.name))
 
 	templates[new_name] = new_file.name
 
 	write_config(templates, paths["templates_config"])
 
 	if remove:
-		new_file.unlink()
+		delete(new_file)
 
 def remove_template(name, templates, paths):
 	if name not in templates.keys():
@@ -58,36 +81,6 @@ def remove_template(name, templates, paths):
 	templates.pop(name)
 	write_config(templates, paths["templates_config"])
 
+	template_path = pl.Path(template_path)
 	if template_path.exists():
-		template_path.unlink()
-
-
-def list_settings(settings):
-	print("Your current settings:")
-	print("----------------------")
-	for key, value in settings.items():
-		print(f"{key:<20}{value:<20}")
-
-def change_setting(setting, state, settings, paths):
-	if not setting in settings.keys():
-		print(f"{setting} is not an avalible setting name, check the possible settings by typing")
-		print("template settings -l")
-		exit()
-
-	setting_type = type(settings[setting])
-	try:
-		if setting_type is not bool:
-			state = setting_type(state)
-		else:
-			if state.lower() in ["1", "true"]:
-				state = 1
-			elif state.lower() in ["0", "false"]:
-				state = 0
-			else: 
-				print(f"Chould not covert {state} to bool, please try 1/true/True or 0/false/False") 
-	except TypeError:
-		print(f"The state {state} is not a valid input for {setting}, excepted input covertible to {setting_type}")
-		exit()
-
-	settings[setting] = state
-	write_config(settings, paths["settings_config"])
+		delete(template_path)

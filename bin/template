@@ -1,6 +1,10 @@
 #!/usr/bin/env python
-from template.main import copy_template, list_templates, add_template, remove_template, list_settings, change_setting
 from template.loader import load_paths, load_templates, load_settings
+from template.main import copy_template, add_template, remove_template
+
+from template.menu import list_templates
+from template.settings import list_settings, change_setting
+
 import argparse
 
 paths = load_paths()
