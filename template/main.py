@@ -73,7 +73,7 @@ def copy_template(template_name, templates, paths, check_exsits=True, new_name=N
 
 	Args:
 		template_name (str): Name of the template to copy, as stored as keys in templates dict
-		templates (dict[str: PosixPath]): Dict storing all templates and paths
+		templates (dict[str: str]): Dict storing all templates and their saved names
 		paths: (dict[str: PosixPath]): Dict storing all paths
 		check_exsits (bool): Optional, check if the path written to already exsists, promts a yes/no screen
 		new_name (str): Optional, new name to be given to copied file
@@ -109,7 +109,7 @@ def add_template(new_file, new_name, templates, paths, remove=False):
 	Args:
 		new_file (str): Name of source file/folder to add to templates
 		new_name (str): Name to be stored as key in templates
-		template (dict[str: PosixPath]): Stored templates
+		template (dict[str: str]): Stored templates
 		paths (dict[str: PosixPath]): Stored paths
 		remove (bool): Optional, if the source file/folder should be removed after addition  
 	"""
@@ -130,7 +130,7 @@ def remove_template(name, templates, paths):
 
 	Args:
 		name (str): Name of the template to remove
-		templates (dict[str: PosixPath]): Stored templates
+		templates (dict[str: str]): Stored templates
 		paths (dict[str: PosixPath]): Stored paths
 	"""
 	if name not in templates.keys():
