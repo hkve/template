@@ -5,3 +5,6 @@ __pycache__/
 sandkasse/
 notes.md
 
+Template_copier.egg-info/
+build/
+

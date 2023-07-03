@@ -2,7 +2,7 @@ import json
 import shutil
 import pathlib as pl
 import subprocess
-from template.utils import ask_user, write_config
+from template.utils import ask_user, write_config, new_stored_name
 
 def copy(old, new):
 	"""
@@ -102,9 +102,11 @@ def copy_template(template_name, templates, paths, check_exsits=True, new_name=N
 		if open_editor:
 			subprocess.run([editor, new]) 
 
+
 def add_template(new_file, new_name, templates, paths, remove=False):
 	"""
 	Adds a template to template dict. Can also optionally remove the source file/folder.
+	If conflicting names are present, promt user to choose new name.
 
 	Args:
 		new_file (str): Name of source file/folder to add to templates
@@ -113,11 +115,18 @@ def add_template(new_file, new_name, templates, paths, remove=False):
 		paths (dict[str: PosixPath]): Stored paths
 		remove (bool): Optional, if the source file/folder should be removed after addition  
 	"""
+
 	new_file = pl.Path(new_file)
+	new_file_stored = pl.Path(new_file)
 
-	copy(new_file, paths["templates"].joinpath(new_file.name))
+	stored_names = list(templates.values())
+	if new_file.name in stored_names:
+		new_file_stored = new_stored_name(new_file.name, stored_names)
+		new_file_stored = pl.Path(new_file_stored)
 
-	templates[new_name] = new_file.name
+	copy(new_file, paths["templates"].joinpath(new_file_stored.name))
+
+	templates[new_name] = new_file_stored.name
 
 	write_config(templates, paths["templates_config"])
 
