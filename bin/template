@@ -51,7 +51,7 @@ if command == "get":
 	copy_template(template_name, templates, paths, check_exsists, new_name, open_editor, editor)
 
 if command == "list":
-	list_templates(templates)
+	list_templates(templates, paths["templates"])
 
 if command == "add":
 	new_file = args["file"]
