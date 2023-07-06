@@ -41,11 +41,14 @@ def new_stored_name(filename, invalid_names, default_msg=True):
     if default_msg:
         print(f"There is already a template file/folder stored under the name {filename}")
         print(f"This will overwrite your old template content as well.")
-    
+        print(f"Type '--force' to overwride")
+
     print(f"Please enter a new name for storage:")
 
     new_filename = str(input(">: ")).strip()
 
+    if new_filename == "--force":
+        return filename
     if new_filename in invalid_names:
         return new_stored_name(new_filename, invalid_names)
     if not is_valid_filename(new_filename):
